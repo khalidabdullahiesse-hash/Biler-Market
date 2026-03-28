@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biler Market - Products</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="site-header">
+      <div class="site-logo">
+        <div class="logo-icon">🛒</div>
+        <h1>Biler Market</h1>
+      </div>
+      <p class="site-tagline">Product Management Dashboard</p>
+    </header>
+
+    <!-- Stats bar -->
+    <div class="stats-bar">
+      <div class="stat-pill">
+        <span id="totalCount">0</span>
+        Products
+      </div>
+      <div class="stat-pill">
+        <span id="totalValue">$0</span>
+        Total Value
+      </div>
+    </div>
+
+    <!-- Add Product -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon add">✦</div>
+        <h2>Add Product</h2>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" for="name">Name</label>
+          <input type="text" id="name" placeholder="Product name">
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="price">Price</label>
+          <input type="number" id="price" placeholder="0.00">
+        </div>
+      </div>
+      <button onclick="addProduct()">+ Add Product</button>
+    </div>
+
+    <!-- Search -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon search">◎</div>
+        <h2>Search Product</h2>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="search" placeholder="Search by name or price..." onkeyup="searchProduct()">
+      </div>
+    </div>
+
+    <!-- Product List -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon list">▤</div>
+        <h2>Products</h2>
+      </div>
+      <ul id="productList">
+        <li class="product-list-empty" style="display:flex; justify-content:center; border:none; background:none;">
+          No products yet. Add one above!
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script src="./js/app.js"></script>
+
+  <!-- Patch to update stats bar when products change -->
+  <script>
+    // Wrap addProduct to also update stats
+    document.addEventListener('DOMContentLoaded', () => {
+      const _orig = window.addProduct;
+      if (_orig) {
+        window.addProduct = function() {
+          _orig();
+          updateStats();
+        };
+      }
+      updateStats();
+
+      // Observe list changes
+      const list = document.getElementById('productList');
+      if (list) {
+        new MutationObserver(updateStats).observe(list, { childList: true, subtree: true });
+      }
+    });
+
+    function updateStats() {
+      const items = document.querySelectorAll('#productList li:not(.product-list-empty)');
+      document.getElementById('totalCount').textContent = items.length;
+      let total = 0;
+      items.forEach(li => {
+        const priceEl = li.querySelector('.product-price');
+        if (priceEl) {
+          const val = parseFloat(priceEl.textContent.replace(/[^0-9.]/g, ''));
+          if (!isNaN(val)) total += val;
+        }
+      });
+      document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
+    }
+  </script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 import express from "express";
-import bcrypt from "bcrypt";
 import User from "../db/models/users.js";
 
 const router = express.Router();
@@ -7,11 +6,7 @@ const router = express.Router();
 // Create user
 router.post("/users", async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 8);
-    const user = new User({
-      ...req.body,
-      password: hashedPassword
-    });
+    const user = new User(req.body);
     await user.save();
     res.status(201).send(user);
   } catch (error) {
@@ -20,6 +15,29 @@ router.post("/users", async (req, res) => {
   }
 });
 
+router.post("/users/login", async (req, res) => {
+  try {
+    const user = await User.findByCredential(
+      req.body.email,
+      req.body.password
+    )
+    res.status(201).send(user);
+  } catch (error) {
+    console.log("Error:", error.message);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+
+router.get("/users/me", async (req, res) => {
+  try {
+
+    res.status(201).send(user);
+  } catch (error) {
+    console.log("Error:", error.message);
+    res.status(500).send({ error: error.message });
+  }
+});
 // Get all users
 router.get("/users", async (req, res) => {
   try {
@@ -67,6 +85,10 @@ router.delete("/users/:id", async (req, res) => {
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
+});
+
+router.get('/home', (req, res) => {
+  res.sendFile('index.html', { root: __dirname });
 });
 
 export default router;

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biler Market - Login</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="site-header">
+        <div class="site-logo">
+          <div class="logo-icon">🛒</div>
+          <h1>Biler Market</h1>
+        </div>
+        <p class="site-tagline">Secure Login</p>
+      </header>
+
+      <!-- Login Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon add">🔐</div>
+          <h2>Login</h2>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" />
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <button id="loginBTN">Login</button>
+
+        <a
+          href="./sighup.html"
+          style="color: var(--accent); text-decoration: none"
+          onmouseover="this.style.textDecoration = 'underline'"
+          onmouseout="this.style.textDecoration = 'none'"
+        >
+          Sign up
+        </a>
+      </div>
+    </div>
+
+    <header class="site-header">
+      <div class="site-logo">
+        <h1 id="fill"></h1>
+      </div>
+    </header>
+
+    <script src="./js/userAPI.js"></script>
+  </body>
+</html>

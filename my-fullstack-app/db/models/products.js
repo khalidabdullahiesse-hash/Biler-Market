@@ -10,7 +10,12 @@ const Product = mongoose.model('products', {
         type:Number,
         required:true,
         default:0
-    }
+    },
+    // owner:{
+    //     type:mongoose.Schema.Types.ObjectId,
+    //     require:true,
+    //     ref:"User"
+    // }
 })
 
 

@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../db/models/users.js";
+import auth from "../middleware/auth.js"
 
 const router = express.Router();
 
@@ -17,27 +18,34 @@ router.post("/users", async (req, res) => {
 
 router.post("/users/login", async (req, res) => {
   try {
-    const user = await User.findByCredential(
-      req.body.email,
-      req.body.password
-    )
-    res.status(201).send(user);
+    const user = await User.findByCredentials(req.body.email, req.body.password);
+    const token = await user.generateAuthToken()
+    res.status(201).send({user, token});
   } catch (error) {
     console.log("Error:", error.message);
     res.status(500).send({ error: error.message });
   }
 });
 
+// GET /users - Get all users
+router.get("/users/me", auth, async (req, res) => {
+  res.send(req.user);
+});
 
-router.get("/users/me", async (req, res) => {
+// POST /user/logout - Logout
+router.post("/logout", auth, async (req, res) => {
   try {
-
-    res.status(201).send(user);
+    req.user.tokens = req.user.tokens.filter((token) => {
+      return token.token !== req.token;
+    });
+    await req.user.save();
+    res.send();
   } catch (error) {
-    console.log("Error:", error.message);
-    res.status(500).send({ error: error.message });
+    console.log(error);
+    res.status(500).send({ error: "Internal server error" });
   }
 });
+
 // Get all users
 router.get("/users", async (req, res) => {
   try {
@@ -48,23 +56,14 @@ router.get("/users", async (req, res) => {
   }
 });
 
-// Get one user
-router.get("/users/:id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).send({ error: "User not found" });
-    }
-    res.send(user);
-  } catch (error) {
-    res.status(500).send({ error: error.message });
-  }
-});
 
 // Update user
 router.patch("/users/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
@@ -87,8 +86,8 @@ router.delete("/users/:id", async (req, res) => {
   }
 });
 
-router.get('/home', (req, res) => {
-  res.sendFile('index.html', { root: __dirname });
+router.get("/home", (req, res) => {
+  res.sendFile("index.html", { root: __dirname });
 });
 
 export default router;

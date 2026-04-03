@@ -364,6 +364,7 @@ li:hover {
   gap: 10px;
   margin-bottom: 20px;
   animation: fadeUp 0.5s ease 0.05s both;
+  font-style: inherit;
 }
 
 .stat-pill {
@@ -513,3 +514,44 @@ li:hover {
   color: #34d399;
   font-weight: bold;
 }
+
+.alert {
+    display: none; /* 👈 hidden by default */
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff4d4d, #cc0000);
+    color: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+    animation: slideDown 0.5s ease;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 20px;
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    background: #6366f1;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }

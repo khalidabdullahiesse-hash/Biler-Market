@@ -1,68 +1,86 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biler Market - Sign Up</title>
-<link rel="stylesheet" href="./css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biler Market - Sign Up</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="site-header">
+        <div class="site-logo">
+          <div class="logo-icon">🛒</div>
+          <h1>Biler Market</h1>
+        </div>
+        <p class="site-tagline">Create Your Account</p>
+      </header>
 
-  <div class="container">
+      <!-- Signup Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon add">✨</div>
+          <h2>Sign Up</h2>
+        </div>
 
-    <!-- Header -->
-    <header class="site-header">
-      <div class="site-logo">
-        <div class="logo-icon">🛒</div>
-        <h1>Biler Market</h1>
+        <div class="input-group">
+          <label class="input-label">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name" />
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" />
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <input type="password" id="password" placeholder="Create password" />
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm password"
+          />
+        </div>
+
+        <button id="registerUser">Create Account</button>
+
+        <p
+          style="
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+          "
+        >
+          Already have an account?
+          <a
+            href="./login.html"
+            style="color: var(--accent); text-decoration: none"
+            >Login</a
+          >
+        </p>
       </div>
-      <p class="site-tagline">Create Your Account</p>
-    </header>
-
-    <!-- Signup Card -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon add">✨</div>
-        <h2>Sign Up</h2>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Full Name</label>
-        <input type="text" id="name" placeholder="Enter your name">
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Email</label>
-        <input type="email" id="email" placeholder="Enter your email">
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Password</label>
-        <input type="password" id="password" placeholder="Create password">
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Confirm Password</label>
-        <input type="password" id="confirmPassword" placeholder="Confirm password">
-      </div>
-
-      <button id="registerUser">Create Account</button>
-
-      <p style="text-align:center; margin-top:14px; font-size:0.8rem; color:var(--text-muted);">
-        Already have an account? 
-        <a href="./login.html" style="color:var(--accent); text-decoration:none;">Login</a>
-      </p>
     </div>
 
-  </div>
-
-  
     <header class="site-header">
       <div class="site-logo">
         <h1 id="beil"></h1>
       </div>
     </header>
 
-  <script src="./js/userAPI.js"></script>
-</body>
+
+    <div class="alert" id="alertBox">
+      <span class="close-btn" onclick="closeAlert()">&times;</span>
+      <strong>Error!</strong>
+      <p id="Error"></p>
+    </div>
+
+    <script src="./js/userAPI.js"></script>
+  </body>
 </html>

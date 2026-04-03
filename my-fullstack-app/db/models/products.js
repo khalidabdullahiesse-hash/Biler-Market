@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const Product = mongoose.model('products', {
+const userSchema = new mongoose.Schema({
     product:{
         type:String,
         required:true,
@@ -11,12 +11,13 @@ const Product = mongoose.model('products', {
         required:true,
         default:0
     },
-    // owner:{
-    //     type:mongoose.Schema.Types.ObjectId,
-    //     require:true,
-    //     ref:"User"
-    // }
+    owner:{
+        type:mongoose.Schema.Types.ObjectId,
+        require:true,
+        ref:"User"
+    }
 })
 
+const Product = mongoose.model('Product', userSchema)
 
 export default Product

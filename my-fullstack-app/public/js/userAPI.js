@@ -14,7 +14,6 @@ if (loginBTN) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await res.json();
 
       if (!res.ok) {
@@ -44,11 +43,12 @@ if (loginBTN) {
       }
 
       console.log("Authenticated user:", meData);
-      document.getElementById("fill").textContent =`Welcome Back, ${meData.email}!`;
-      
-      setTimeout(function(){
-        window.location.href= "index.html"
-      },3000)
+      document.getElementById("fill").textContent =
+        `Welcome Back, ${meData.email}!`;
+
+      setTimeout(function () {
+        window.location.href = "index.html";
+      }, 3000);
     } catch (error) {
       console.log("Login error:", error);
     }
@@ -81,7 +81,17 @@ if (registerUser) {
       document.getElementById("beil").textContent =
         `Account created successfully! Welcome, ${name}`;
     } catch (error) {
+      showAlert("Creating Account Failed Please try again")
       console.log("Register error:", error);
     }
   });
+}
+
+function showAlert(error) {
+  document.getElementById("alertBox").style.display = "block";
+  document.getElementById("Error").textContent = error;
+}
+
+function closeAlert() {
+  document.getElementById("alertBox").style.display = "none";
 }

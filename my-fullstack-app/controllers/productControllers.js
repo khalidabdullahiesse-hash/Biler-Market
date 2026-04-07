@@ -1,5 +1,4 @@
 import Product from "../db/models/products.js";
-
 /**
  * @desc Create product
  * @route POST /products
@@ -20,21 +19,41 @@ export const createProduct = async (req, res) => {
   }
 };
 
-
 /**
  * @desc Get all products (user only)
  * @route GET /products
  * @access Private
  */
+
+export const CalTotalProduct = async (req, res) => {
+  try {
+    const result = await Product.aggregate([
+      {
+        $match: { owner: req.user._id },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$price" },
+        },
+      },
+    ]);
+
+    res.send({
+      totalPrice: result[0]?.total || 0,
+    });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 export const getProducts = async (req, res) => {
   try {
-    await req.user.populate("products");
-    res.json(req.user.products);
+    await req.user.populate("product");
+    res.json(req.user.product);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 /**
  * @desc Get single product
@@ -58,7 +77,6 @@ export const getProductById = async (req, res) => {
   }
 };
 
-
 /**
  * @desc Update product
  * @route PATCH /products/:id
@@ -68,9 +86,7 @@ export const updateProduct = async (req, res) => {
   const allowedUpdates = ["name", "price", "description"]; // adjust fields
   const updates = Object.keys(req.body);
 
-  const isValid = updates.every((f) =>
-    allowedUpdates.includes(f)
-  );
+  const isValid = updates.every((f) => allowedUpdates.includes(f));
 
   if (!isValid) {
     return res.status(400).json({ error: "Invalid updates" });
@@ -97,7 +113,6 @@ export const updateProduct = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
 
 /**
  * @desc Delete product

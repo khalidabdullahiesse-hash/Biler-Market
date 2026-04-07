@@ -12,11 +12,9 @@ import {
 } from "../controllers/userControllers.js";
 
 const router = express.Router();
-
 // Public
 router.post("/users", registerUser);
 router.post("/users/login", loginUser);
-
 // Private
 router.get("/users/me", auth, getMe);
 router.post("/users/logout", auth, logoutUser);

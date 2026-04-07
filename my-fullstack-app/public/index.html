@@ -4,18 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Biler Market - Products</title>
-<link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-
 <div class="dashboard">
 
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="logo"><a href="login.html">🛒 Biler</a></div>
-
     <nav>
-      <a class="active">Products</a>
+      <a class="active"><span class="nav-dot"></span>Products</a>
       <a>Bundle</a>
       <a>License Keys</a>
       <a>Dropshipping</a>
@@ -33,15 +31,15 @@
 
     <!-- Stats -->
     <div class="stats">
-      <div>Total: <span id="totalCount">0</span></div>
-      <div>Value: <span id="totalValue">$0</span></div>
+      <div>Total Products<span id="totalCount">0</span></div>
+      <div>Portfolio Value<span id="totalValue">$0.00</span></div>
     </div>
 
-    <!-- Inputs -->
+    <!-- Controls -->
     <div class="controls">
-      <input type="text" id="name" placeholder="Product name">
-      <input type="number" id="price" placeholder="Price">
-      <input type="text" id="search" placeholder="Search..." onkeyup="searchProduct()">
+      <input type="text"   id="name"   placeholder="Product name">
+      <input type="number" id="price"  placeholder="Price ($)">
+      <input type="text"   id="search" placeholder="🔍 Search products..." onkeyup="searchProduct()">
     </div>
 
     <!-- Products Grid -->
@@ -49,41 +47,55 @@
 
   </main>
 </div>
-  <script src="./js/productAPI.js"></script>
 
-  <!-- Patch to update stats bar when products change -->
-  <script>
-    // Wrap addProduct to also update stats
-    document.addEventListener('DOMContentLoaded', () => {
-      const _orig = window.addProduct;
-      if (_orig) {
-        window.addProduct = function() {
-          _orig();
-          updateStats();
-        };
-      }
-      updateStats();
+<script src="./js/productAPI.js"></script>
 
-      // Observe list changes
-      const list = document.getElementById('productList');
-      if (list) {
-        new MutationObserver(updateStats).observe(list, { childList: true, subtree: true });
+<!-- Stats updater -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const _orig = window.addProduct;
+    if (_orig) {
+      window.addProduct = function () {
+        _orig();
+        updateStats();
+      };
+    }
+    updateStats();
+
+    const list = document.getElementById('productList');
+    if (list) {
+      new MutationObserver(updateStats).observe(list, { childList: true, subtree: true });
+    }
+  });
+
+  function updateStats() {
+    // Works with both <li> list items and .product-card divs
+    const cards  = document.querySelectorAll('#productList .product-card');
+    const items  = document.querySelectorAll('#productList li:not(.product-list-empty)');
+    const count  = cards.length || items.length;
+
+    document.getElementById('totalCount').textContent = count;
+
+    let total = 0;
+
+    cards.forEach(card => {
+      const priceEl = card.querySelector('.price');
+      if (priceEl) {
+        const val = parseFloat(priceEl.textContent.replace(/[^0-9.]/g, ''));
+        if (!isNaN(val)) total += val;
       }
     });
 
-    function updateStats() {
-      const items = document.querySelectorAll('#productList li:not(.product-list-empty)');
-      document.getElementById('totalCount').textContent = items.length;
-      let total = 0;
-      items.forEach(li => {
-        const priceEl = li.querySelector('.product-price');
-        if (priceEl) {
-          const val = parseFloat(priceEl.textContent.replace(/[^0-9.]/g, ''));
-          if (!isNaN(val)) total += val;
-        }
-      });
-      document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
-    }
-  </script>
+    items.forEach(li => {
+      const priceEl = li.querySelector('.product-price');
+      if (priceEl) {
+        const val = parseFloat(priceEl.textContent.replace(/[^0-9.]/g, ''));
+        if (!isNaN(val)) total += val;
+      }
+    });
+
+    document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
+  }
+</script>
 </body>
 </html>

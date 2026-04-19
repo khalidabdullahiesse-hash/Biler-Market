@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 import chalk from "chalk";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Use ONLY ONE clean URL
-const connectionURL =
-  "mongodb+srv://khalidpower:zICsvOiFu9Ut3y1g@cluster0.wr7epe1.mongodb.net/Biller-market?appName=Cluster0";
+const connectionURL = process.env.MONGO_URI;
 
 // Function to connect to MongoDB
 const connectDB = async () => {

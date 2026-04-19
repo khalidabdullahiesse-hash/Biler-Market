@@ -1,12 +1,11 @@
+const API_BASE = "https://biler-market.onrender.com";
 const token = localStorage.getItem("token");
 
+// ─── DISPLAY PRODUCTS ───────────────────────────────────
 function displayProduct(products) {
   const container = document.getElementById("productList");
+  container.classList.add("grid");
 
-  // Add the grid class to your parent container so the CSS grid layout applies
-  container.classList.add("grid"); 
-
-  // Generate the HTML for all products and insert it
   container.innerHTML = products.map((product) => `
     <div class="product-card">
       <span class="tag">Available</span>
@@ -16,71 +15,101 @@ function displayProduct(products) {
   `).join("");
 }
 
+// ─── LOAD PRODUCTS ──────────────────────────────────────
 async function loadProduct() {
-  const res = await fetch("http://localhost:5000/products", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`, // ✅ IMPORTANT
-    },
-  });
-  const data = await res.json();
+  try {
+    const res = await fetch(`${API_BASE}/products`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  displayProduct(data);
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.log("Failed to load products");
+      return;
+    }
+
+    displayProduct(data);
+  } catch (error) {
+    console.log("Load error:", error);
+  }
 }
 
-function searchProduct() {
-  const query = document.getElementById("search").value.toLowerCase();
-  const lis = document.querySelectorAll("#productList li");
-  lis.forEach((li) => {
-    const text = li.textContent.toLowerCase();
-    li.style.display = text.includes(query) ? "" : "none";
-
-
-  });
-}
-
+// ─── ADD PRODUCT ────────────────────────────────────────
 async function addProduct() {
   const product = document.getElementById("name").value;
   const price = document.getElementById("price").value;
 
-  if (!product) {
-    console.error("fill the page");
+  if (!product || !price) {
+    console.log("Fill all fields");
+    return;
   }
 
-  const res = await fetch("http://localhost:5000/products", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-     "Authorization": `Bearer ${token}`, // ✅ IMPORTANT
-    },
-    body: JSON.stringify({
-      product,
-      price,
-    }),
-  });
+  try {
+    const res = await fetch(`${API_BASE}/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ product, price }),
+    });
 
-  const newProduct = await res.json();
+    const data = await res.json();
 
-  loadProduct();
+    if (!res.ok) {
+      console.log("Failed to add product");
+      return;
+    }
 
-  document.getElementById("name").value = "";
-  document.getElementById("price").value = "";
+    console.log("Product added:", data);
+    loadProduct();
+
+    document.getElementById("name").value = "";
+    document.getElementById("price").value = "";
+  } catch (error) {
+    console.log("Add error:", error);
+  }
 }
-async function CalicutProduct() {
-  const calTotalProduct = await fetch("http://localhost:5000/products/total", {
-    method: "get",
-    header: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`, // ✅ IMPORTANT
-    },
-    body: JSON.stringify({
-      totalPrice,
-    }),
-  });
 
-  const total = await res.json();
+// ─── TOTAL PRICE ────────────────────────────────────────
+async function calcTotalProduct() {
+  try {
+    const res = await fetch(`${API_BASE}/products/total`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  const totalValue = (document.getElementById("totalValue").value = total);
+    const total = await res.json();
+
+    if (!res.ok) {
+      console.log("Failed to get total");
+      return;
+    }
+
+    document.getElementById("totalValue").value = total;
+  } catch (error) {
+    console.log("Total error:", error);
+  }
 }
+
+// ─── SEARCH (FIXED) ─────────────────────────────────────
+function searchProduct() {
+  const query = document.getElementById("search").value.toLowerCase();
+  const cards = document.querySelectorAll(".product-card");
+
+  cards.forEach((card) => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(query) ? "" : "none";
+  });
+}
+
+// ─── INIT ───────────────────────────────────────────────
 loadProduct();

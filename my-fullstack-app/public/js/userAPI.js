@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://biler-market.onrender.com";
 
 // ─── LOGIN ───────────────────────────────────────────────
 const loginBTN = document.getElementById("loginBTN");

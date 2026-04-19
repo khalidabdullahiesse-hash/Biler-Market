@@ -1,24 +1,39 @@
 // server.js
 import express from "express";
-import cors from 'cors'
+import cors from "cors";
 import chalk from "chalk";
 import connectDB from "./db/mongoose.js";
-import "./db/mongoose.js"
-import productsRouter from './routes/productsRouter.js'
-import userRouter from './routes/usersRouter.js'
-import loanRouter from './routes/loanRouter.js'
 
-const app = express();
+import productsRouter from "./routes/productsRouter.js";
+import userRouter from "./routes/usersRouter.js";
+import loanRouter from "./routes/loanRouter.js";
+
+const app = express(); // ✅ FIRST create app
 const port = process.env.PORT || 5000;
+
+// ✅ CORS (put BEFORE routes)
+app.use(
+  cors({
+    origin: "*", // for testing
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  }),
+);
+
+// ✅ Handle preflight (important for your error)
+app.options("*", cors());
+
+// ✅ Body parser
 app.use(express.json());
-app.use(cors())
-app.use(userRouter)
-app.use(productsRouter)
+
+// ✅ Routes
+app.use(userRouter);
+app.use(productsRouter);
 app.use(loanRouter);
 
-// Connect to DB and start server
+// ✅ Connect DB
 connectDB();
 
+// ✅ Start server
 app.listen(port, () => {
   console.log(chalk.bold.green.bgWhite("Server UP Running on port " + port));
 });

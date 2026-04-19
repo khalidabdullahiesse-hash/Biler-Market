@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import User from "../db/models/users.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 const auth = async (req, res, next) => {
   try {
     const token = req.headers["authorization"]?.replace("Bearer ", "");
@@ -9,7 +11,7 @@ const auth = async (req, res, next) => {
       return res.status(401).send("No token provided");
     }
 
-    const decoded = jwt.verify(token, "thisMyToken");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({ _id: decoded._id, "tokens.token": token });
     await user.save()
     if (!user) {

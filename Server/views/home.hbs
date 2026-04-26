@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biler Market — Products</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Biler Market</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html" class="active">Products</a></li>
+  </ul>
+  <button class="add-btn" onclick="openAddModal()">+ Add Product</button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div>
+    <h1>Products</h1>
+    <p id="listingCount">Loading…</p>
+  </div>
+  <button class="add-btn" onclick="openAddModal()">+ Add Product</button>
+</div>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <input class="search-input" id="searchInput" type="text"
+    placeholder="🔍  Search by product name…" oninput="renderTable()"/>
+    
+  <select class="sort-select" id="sortSelect" onchange="renderTable()">
+    <option value="default">Sort: Default</option>
+    <option value="name-asc">Name A → Z</option>
+    <option value="name-desc">Name Z → A</option>
+    <option value="price-asc">Price: Low → High</option>
+    <option value="price-desc">Price: High → Low</option>
+  </select>
+</div>
+
+<!-- TABLE -->
+<div class="table-section">
+  <div class="count-label" id="countLabel"></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>MongoDB _id</th>
+          <th>Product Name</th>
+          <th>Price (DKK)</th>
+          <th style="text-align:right">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODALS + TOAST (keep exactly same) -->
+<!-- 👉 copy ALL modal + toast HTML here exactly as is (no changes) -->
+
+<!-- External JS -->
+<script src="app.js"></script>
+
+</body>
+</html>

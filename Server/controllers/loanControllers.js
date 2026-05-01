@@ -26,7 +26,7 @@ export const getAllLoans = async (req, res) => {
     try {
         const loans = await Loan.find({ owner: req.user._id });
 
-        res.status(200).json({ count: loans.length, loans });
+        res.status(200).json(loans);
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }

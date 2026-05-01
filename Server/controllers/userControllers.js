@@ -1,5 +1,5 @@
 import User from "../db/models/users.js";
-import auth from "../middleware/auth.js";
+// import auth from "../middleware/auth.js";
 
 /**
  * @desc Register user

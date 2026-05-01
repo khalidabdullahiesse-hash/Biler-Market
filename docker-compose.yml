@@ -1,0 +1,38 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Server/dockerfile.server
+      target: dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./Server:/app
+      - /app/node_modules
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb+srv://khalidpower:zICsvOiFu9Ut3y1g@cluster0.38lfiks.mongodb.net/Biller-market?appName=Cluster0
+      - JWT_SECRET=mysecretkey
+    networks:
+      - app-network
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Biler-Market/dockerfile.client
+      target: dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client/Biler-Market:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - server
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

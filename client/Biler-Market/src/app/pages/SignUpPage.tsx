@@ -4,37 +4,47 @@ import { Package, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { loginUser } from "../api/api";
+import { registerUser } from "../api/api";
 
-export function LoginPage() {
+export function SignUpPage() {
   const navigate = useNavigate();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await loginUser({ email, password });
+      // Assuming registerUser returns Promise<{ data: { token: string } }>
+      const res = await registerUser({ name: fullName, password, email });
       const token = res.data?.token;
 
       if (token) {
         localStorage.setItem("token", token);
       }
 
-      navigate("/");
+      // Navigate to dashboard after successful signup
+      navigate("/", { replace: true });
     } catch (err: any) {
       const message =
         err?.response?.data?.message ||
         err?.message ||
-        "Invalid email or password.";
+        "Something went wrong. Please try again.";
       setError(message);
     } finally {
-      setLoading(false);
+      setLoading(false); // Added to reset loading state
     }
   };
 
@@ -50,9 +60,7 @@ export function LoginPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Biler-Market
             </h1>
-            <p className="text-gray-600">
-              Sign in to your marketplace dashboard
-            </p>
+            <p className="text-gray-600">Create your marketplace account</p>
           </div>
 
           {/* Error message */}
@@ -63,14 +71,27 @@ export function LoginPage() {
             </div>
           )}
 
-          {/* Login form */}
+          {/* Sign up form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                type="text"
+                placeholder="John Doe"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                disabled={loading}
+                className="mt-1"
+              />
+            </div>
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@biler-market.com"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -91,37 +112,38 @@ export function LoginPage() {
                 className="mt-1"
               />
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-gray-600">Remember me</span>
-              </label>
-              <a href="#" className="text-blue-600 hover:text-blue-700">
-                Forgot password?
-              </a>
+            <div>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={loading}
+                className="mt-1"
+              />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Signing in...
+                  Creating account...
                 </>
               ) : (
-                "Sign In"
+                "Create Account"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <a
-              href="/signup"
+              href="/login"
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              Sign Up
+              Sign In
             </a>
           </div>
         </div>

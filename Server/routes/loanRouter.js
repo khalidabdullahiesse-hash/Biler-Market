@@ -13,7 +13,7 @@ const router = express.Router();
 // All routes are protected
 router.post("/loans", auth, createLoan);
 router.get("/loans", auth, getAllLoans);
-router.get("/loans", auth, getSingleLoan);
+router.get("/loans/:id", auth, getSingleLoan);
 router.patch("/loans/:id/pay", auth, updatePaidAmount);
 router.delete("/loans/:id", auth, deleteLoan);
 

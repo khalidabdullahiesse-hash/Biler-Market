@@ -44,9 +44,9 @@ export interface User {
 }
 
 export interface Loan {
-  paidAmount(paidAmount: any): import("react").ReactNode;
   _id?: string;
   totalAmount: number;
+  paidAmount: number;
   remainAmount: number;
   owner: string;
   createdAt?: string;
@@ -72,7 +72,7 @@ export const registerUser = (userData: {
   name: string;
   email: string;
   password: string;
-}) => api.post<User>("/users", userData);
+}) => api.post<{ user: User; token: string }>("/users", userData);
 
 export const loginUser = (userData: {
   email: string;

@@ -1,29 +1,39 @@
 import mongoose from "mongoose";
 
-
-const loanSchema = new mongoose.Schema({
-    totalAmount:{
-        type:Number,
-        require:true,
+const loanSchema = new mongoose.Schema(
+  {
+    totalAmount: {
+      type: Number,
+      require: true,
     },
-    paidAmount:{
-        type:Number,
-        default:0,
+    paidAmount: {
+      type: Number,
+      default: 0,
     },
-    remainAmount:{
-        type:Number,
-        require:true
+    remainAmount: {
+      type: Number,
+      require: true,
     },
-    owner:{
-        type:mongoose.Schema.Types.ObjectId,
-        require:true
-    }
-},{
-    timestamps:true,
-    toJSON:{virtuals:true},
-    toObject:{virtuals:true}
-})
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      require: true,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
+);
 
-const Loan = mongoose.model("Loan", loanSchema)
+// Virtual to calculate remainAmount before saving
+loanSchema.pre("save", function (next) {
+  if (this.totalAmount && this.paidAmount !== undefined) {
+    this.remainAmount = this.totalAmount - this.paidAmount;
+  }
+  next();
+});
 
-export default Loan
+const Loan = mongoose.model("Loan", loanSchema);
+
+export default Loan;

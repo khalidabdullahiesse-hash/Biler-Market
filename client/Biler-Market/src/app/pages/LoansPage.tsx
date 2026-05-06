@@ -1,18 +1,29 @@
 import { useState, useEffect } from "react";
 import { LoadingIndicator } from "../../components/application/loading-indicator/loading-indicator";
-import { Search, MoreVertical, Check, Eye, DollarSign, RefreshCw, Trash2 } from "lucide-react";
+import {
+  Search,
+  MoreVertical,
+  Check,
+  Eye,
+  DollarSign,
+  RefreshCw,
+  Trash2,
+  Plus,
+} from "lucide-react";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { getAllLoans, Loan, deleteLoan } from "../api/api";
+import { getAllLoans, Loan, deleteLoan, createLoan } from "../api/api";
 
-function fmt(num: number) {
+function fmt(num: number | undefined) {
+  if (num === undefined || num === null) return "$0";
   return "$" + num.toLocaleString();
 }
 
@@ -24,8 +35,13 @@ function fmtDate(iso: string) {
   });
 }
 
-function getRepaymentPct(paidAmount: number, totalAmount: number) {
-  return totalAmount > 0 ? Math.round((paidAmount / totalAmount) * 100) : 0;
+function getRepaymentPct(
+  paidAmount: number | undefined,
+  totalAmount: number | undefined,
+) {
+  if (!totalAmount || totalAmount <= 0) return 0;
+  const paid = paidAmount || 0;
+  return Math.round((paid / totalAmount) * 100);
 }
 
 export function LoansPage() {
@@ -33,13 +49,23 @@ export function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newLoanAmount, setNewLoanAmount] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const fetchLoans = async () => {
     try {
       setLoading(true);
       const res = await getAllLoans();
       // Ensure we get an array (backend should return array now)
-      setLoans(Array.isArray(res.data) ? res.data : []);
+      let loansData = Array.isArray(res.data) ? res.data : [];
+      // Ensure each loan has remainAmount calculated
+      loansData = loansData.map((loan) => ({
+        ...loan,
+        remainAmount:
+          loan.remainAmount ?? loan.totalAmount - (loan.paidAmount || 0),
+      }));
+      setLoans(loansData);
       setError(null);
     } catch (err) {
       console.error(err);
@@ -63,9 +89,41 @@ export function LoansPage() {
     }
   };
 
+  const handleCreateLoan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError(null);
+
+    const amount = parseFloat(newLoanAmount);
+    if (!amount || amount <= 0) {
+      setCreateError("Please enter a valid amount greater than 0");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      await createLoan({
+        totalAmount: amount,
+        paidAmount: 0,
+        remainAmount: amount,
+        owner: "",
+      });
+      setNewLoanAmount("");
+      fetchLoans();
+      setCreateError(null);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message || err?.message || "Failed to create loan";
+      setCreateError(message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const filteredLoans = loans.filter((loan) => {
     const q = searchQuery.toLowerCase();
-    return !q || String(loan.totalAmount).includes(q) || String(loan._id).includes(q);
+    return (
+      !q || String(loan.totalAmount).includes(q) || String(loan._id).includes(q)
+    );
   });
 
   const activeCount = loans.filter((l) => l.remainAmount > 0).length;
@@ -77,7 +135,9 @@ export function LoansPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Your Loans</h1>
-          <p className="text-gray-600 mt-1">Manage your active and completed loans</p>
+          <p className="text-gray-600 mt-1">
+            Manage your active and completed loans
+          </p>
         </div>
       </div>
 
@@ -88,7 +148,9 @@ export function LoansPage() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Loans</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{activeCount}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {activeCount}
+                </p>
               </div>
               <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-white" />
@@ -101,7 +163,9 @@ export function LoansPage() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-gray-600">Fully Paid</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{fullyPaidCount}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {fullyPaidCount}
+                </p>
               </div>
               <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
                 <Check className="w-5 h-5 text-white" />
@@ -114,7 +178,9 @@ export function LoansPage() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Borrowed</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{fmt(totalValue)}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {fmt(totalValue)}
+                </p>
               </div>
               <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-white" />
@@ -124,6 +190,55 @@ export function LoansPage() {
         </Card>
       </div>
 
+      {/* Create Loan Form */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Create New Loan
+          </h2>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleCreateLoan} className="flex gap-4 items-end">
+            <div className="flex-1 max-w-sm">
+              <Label
+                htmlFor="loanAmount"
+                className="text-sm font-medium text-gray-700"
+              >
+                Loan Amount
+              </Label>
+              <Input
+                id="loanAmount"
+                type="number"
+                placeholder="Enter loan amount"
+                value={newLoanAmount}
+                onChange={(e) => setNewLoanAmount(e.target.value)}
+                disabled={creating}
+                className="mt-1"
+                step="0.01"
+                min="0"
+              />
+            </div>
+            <Button type="submit" disabled={creating}>
+              {creating ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Loan
+                </>
+              )}
+            </Button>
+          </form>
+          {createError && (
+            <div className="mt-3 text-red-600 text-sm">{createError}</div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Search and Table */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-4">
@@ -153,18 +268,35 @@ export function LoansPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">ID</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">Total Amount</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">Paid Amount</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">Remaining</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">Progress</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">Created At</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700">Actions</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      ID
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Total Amount
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Paid Amount
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Remaining
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Progress
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Created At
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredLoans.map((loan) => {
-                    const pct = getRepaymentPct(loan.paidAmount, loan.totalAmount);
+                    const pct = getRepaymentPct(
+                      loan.paidAmount,
+                      loan.totalAmount,
+                    );
                     return (
                       <tr
                         key={loan._id}
@@ -185,7 +317,9 @@ export function LoansPage() {
                         <td className="py-4 px-4">
                           <div className="w-28">
                             <div className="flex justify-between mb-1">
-                              <span className="text-xs text-gray-500">{pct}%</span>
+                              <span className="text-xs text-gray-500">
+                                {pct}%
+                              </span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-1.5">
                               <div
@@ -212,7 +346,9 @@ export function LoansPage() {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-red-600"
-                                onClick={() => loan._id && handleDelete(loan._id)}
+                                onClick={() =>
+                                  loan._id && handleDelete(loan._id)
+                                }
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete
@@ -225,7 +361,10 @@ export function LoansPage() {
                   })}
                   {filteredLoans.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="py-8 text-center text-gray-500">
+                      <td
+                        colSpan={7}
+                        className="py-8 text-center text-gray-500"
+                      >
                         No loans found.
                       </td>
                     </tr>

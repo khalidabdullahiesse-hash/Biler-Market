@@ -1,6 +1,10 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://biler-market-8qfd.vercel.app/";
+
+if (!API_BASE_URL) {
+  throw new Error("API_BASE_URL is not defined. Check your .env file.");
+}
 
 // Create axios instance
 const api = axios.create({
@@ -13,7 +17,8 @@ api.interceptors.request.use((config: any) => {
 
   if (token) {
     config.headers = config.headers ?? {};
-    (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+    (config.headers as Record<string, string>).Authorization =
+      `Bearer ${token}`;
   }
 
   return config;
@@ -27,7 +32,7 @@ api.interceptors.response.use(
       localStorage.removeItem("token");
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export interface Product {
@@ -52,7 +57,6 @@ export interface Loan {
   createdAt?: string;
 }
 
-
 export const getProducts = () => api.get<Product[]>("/products");
 
 export const getProductTotal = () =>
@@ -64,9 +68,7 @@ export const createProduct = (productData: Product) =>
 export const updateProduct = (id: string, productData: Partial<Product>) =>
   api.patch<Product>(`/products/${id}`, productData);
 
-export const deleteProduct = (id: string) =>
-  api.delete(`/products/${id}`);
-
+export const deleteProduct = (id: string) => api.delete(`/products/${id}`);
 
 export const registerUser = (userData: {
   name: string;
@@ -74,10 +76,7 @@ export const registerUser = (userData: {
   password: string;
 }) => api.post<{ user: User; token: string }>("/users", userData);
 
-export const loginUser = (userData: {
-  email: string;
-  password: string;
-}) =>
+export const loginUser = (userData: { email: string; password: string }) =>
   api.post<{ user: User; token: string }>("/users/login", userData);
 
 export const getMe = () => api.get<User>("/users/me");
@@ -96,11 +95,9 @@ export const createLoan = (loanData: Loan) =>
 
 export const updateLoanPayment = (
   id: string,
-  paymentData: { amount: number }
-) =>
-  api.patch<Loan>(`/loans/${id}/pay`, paymentData);
+  paymentData: { amount: number },
+) => api.patch<Loan>(`/loans/${id}/pay`, paymentData);
 
-export const deleteLoan = (id: string) =>
-  api.delete(`/loans/${id}`);
+export const deleteLoan = (id: string) => api.delete(`/loans/${id}`);
 
 export default api;

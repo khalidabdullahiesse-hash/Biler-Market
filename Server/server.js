@@ -33,7 +33,12 @@ app.use(loanRouter);
 // ✅ Connect DB
 connectDB();
 
-// ✅ Start server
-app.listen(port, () => {
-  console.log(chalk.bold.green.bgWhite("Server UP Running on port " + port));
-});
+// ✅ Export app for Vercel (serverless)
+export default app;
+
+// ✅ Start server (only for local development)
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(chalk.bold.green.bgWhite("Server UP Running on port " + port));
+  });
+}

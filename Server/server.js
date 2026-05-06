@@ -8,37 +8,35 @@ import productsRouter from "./routes/productsRouter.js";
 import userRouter from "./routes/usersRouter.js";
 import loanRouter from "./routes/loanRouter.js";
 
-const app = express(); // ✅ FIRST create app
+const app = express();
 const port = process.env.PORT || 5000;
 
-// ✅ CORS (put BEFORE routes)
+// CORS
 app.use(
   cors({
-    origin: "*", // for testing
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
   }),
 );
 
-// ✅ Handle preflight (important for your error)
+// Handle preflight
 app.options("*", cors());
 
-// ✅ Body parser
+// Body parser
 app.use(express.json());
 
-// ✅ Routes
+// Routes
 app.use(userRouter);
 app.use(productsRouter);
 app.use(loanRouter);
 
-// ✅ Connect DB
+// Connect DB
 connectDB();
 
-// ✅ Export app for Vercel (serverless)
+// Export app
 export default app;
 
-// ✅ Start server (only for local development)
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, () => {
-    console.log(chalk.bold.green.bgWhite("Server UP Running on port " + port));
-  });
-}
+// Start server
+app.listen(port, () => {
+  console.log(chalk.bold.green.bgWhite("Server UP Running on port " + port));
+});

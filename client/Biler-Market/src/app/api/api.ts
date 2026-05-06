@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-const API_BASE_URL = "https://biler-market-8qfd.vercel.app/";
+const API_BASE_URL = "https://biler-market-r2j7.vercel.app/";
 
 if (!API_BASE_URL) {
   throw new Error("API_BASE_URL is not defined. Check your .env file.");

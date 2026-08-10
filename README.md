@@ -1,8 +1,8 @@
-# Biler Market
+<p align="center">\n  <img src=".github/assets/project-banner.svg" alt="Animated Biler Market project banner" width="100%" />\n</p>\n\n# Biler Market
 
 A full-stack business management dashboard for products, users, and loans. The project demonstrates authenticated REST APIs, a TypeScript React frontend, MongoDB persistence, and a Docker-based development environment.
 
-## Verified features
+## ✨ Verified features
 
 - User registration and login with bcrypt password hashing and JWT-based sessions
 - Authenticated profile viewing, updating, deletion, and session logout
@@ -11,7 +11,7 @@ A full-stack business management dashboard for products, users, and loans. The p
 - Dashboard pages for products, users, loans, profile settings, and summary data
 - Docker Compose development services for the frontend and API
 
-## Technology
+## 🧰 Technology
 
 | Area | Technologies |
 |---|---|
@@ -22,7 +22,7 @@ A full-stack business management dashboard for products, users, and loans. The p
 | Authentication | JSON Web Tokens, bcrypt |
 | Development | Docker, Docker Compose, npm |
 
-## Repository structure
+## 🗂️ Repository structure
 
 ```text
 .
@@ -34,7 +34,7 @@ A full-stack business management dashboard for products, users, and loans. The p
 └── docker-compose.yml
 ```
 
-## Environment variables
+## 🔐 Environment variables
 
 Create a local environment file from the committed template:
 
@@ -50,7 +50,7 @@ Copy-Item .env.example .env
 
 Use a long, random JWT secret and a least-privilege MongoDB user. Never commit `.env` files or real credentials.
 
-## Run with Docker
+## 🐳 Run with Docker
 
 From the repository root:
 
@@ -62,7 +62,7 @@ docker compose up --build
 
 The API is exposed at <http://localhost:5000> and the Vite development server at <http://localhost:5173>.
 
-## Run without Docker
+## 💻 Run without Docker
 
 Start the API:
 
@@ -84,7 +84,7 @@ npm run dev
 
 The frontend currently defines its API base URL in `client/Biler-Market/src/app/api/api.ts`. Point that value at `http://localhost:5000` when testing entirely locally.
 
-## REST API
+## 🔌 REST API
 
 All product, loan, and profile routes require an `Authorization: Bearer <token>` header. Registration and login are public.
 
@@ -110,7 +110,7 @@ All product, loan, and profile routes require an `Authorization: Bearer <token>`
 | `PATCH` | `/loans/:id/pay` | Record a payment |
 | `DELETE` | `/loans/:id` | Delete one owned loan |
 
-## Skills demonstrated
+## 🎯 Skills demonstrated
 
 - Connecting a typed React client to an Express REST API
 - Designing user-owned MongoDB resources with Mongoose
@@ -118,13 +118,12 @@ All product, loan, and profile routes require an `Authorization: Bearer <token>`
 - Organizing routes, controllers, middleware, and data models
 - Running a multi-service development environment with Docker Compose
 
-## Project status
+## 📌 Project status
 
 This is a portfolio and learning project. It does not currently include an automated test suite.
 
-## Author
+## 👤 Author
 
 Khalid Abdullahi Isse
 
 [GitHub](https://github.com/khalidabdullahiesse-hash) · [LinkedIn](https://www.linkedin.com/in/khalid-abdullahi-isse-0461a3366)
-

@@ -1,242 +1,130 @@
-# 🛒 Biler Market – Full Stack E-commerce App
+# Biler Market
 
-> A scalable full-stack e-commerce application built with **React** on the frontend and **Node.js** on the backend, following a clean **MVC + Service Layer** architecture.
+A full-stack business management dashboard for products, users, and loans. The project demonstrates authenticated REST APIs, a TypeScript React frontend, MongoDB persistence, and a Docker-based development environment.
 
----
+## Verified features
 
-## 🚀 Tech Stack
+- User registration and login with bcrypt password hashing and JWT-based sessions
+- Authenticated profile viewing, updating, deletion, and session logout
+- User-scoped product creation, listing, updating, deletion, and total-value calculation
+- User-scoped loan creation, listing, payment recording, and deletion
+- Dashboard pages for products, users, loans, profile settings, and summary data
+- Docker Compose development services for the frontend and API
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React, React Router, Axios |
-| Backend | Node.js, Express.js |
-| Database | MongoDB + Mongoose |
-| Auth | JWT (JSON Web Tokens) |
-| Styling | CSS / Tailwind (or your choice) |
+## Technology
 
----
+| Area | Technologies |
+|---|---|
+| Frontend | React 18, TypeScript, Vite, React Router, Axios |
+| UI | Material UI, Radix UI components, Tailwind CSS 4 |
+| Backend | Node.js, Express |
+| Data | MongoDB, Mongoose |
+| Authentication | JSON Web Tokens, bcrypt |
+| Development | Docker, Docker Compose, npm |
 
-## ✨ Features
+## Repository structure
 
-- 🔐 JWT-based Authentication (Register / Login)
-- 👤 User Management
-- 🛍️ Product CRUD (Create, Read, Update, Delete)
-- 🛒 Shopping Cart Logic
-- 📦 Order Processing *(in progress)*
-- ⚡ Clean REST API
-- ⚛️ React SPA Frontend with component-based architecture
-- 🧱 Scalable MVC + Service Layer backend
-
----
-
-## 🧱 Architecture
-
-### Backend — MVC + Service Layer
-
-```
-Routes → Controllers → Services → Database
+```text
+.
+├── client/
+│   └── Biler-Market/       # React and TypeScript frontend
+├── Server/                 # Express API, routes, controllers, and models
+├── .env.example            # Safe environment-variable template
+├── .gitignore
+└── docker-compose.yml
 ```
 
-| Layer | Role |
-|-------|------|
-| **Routes** | Define API endpoints |
-| **Controllers** | Handle request & response |
-| **Services** | Core business logic 🔥 |
-| **Middleware** | Auth, error handling |
-| **DB** | MongoDB connection & models |
+## Environment variables
 
-### Frontend — React SPA
+Create a local environment file from the committed template:
 
-```
-Pages → Components → API Calls (Axios) → Backend REST API
+```powershell
+Copy-Item .env.example .env
 ```
 
-| Layer | Role |
-|-------|------|
-| **Pages** | Route-level views (Home, Cart, Login…) |
-| **Components** | Reusable UI pieces |
-| **Context / State** | Global state (Auth, Cart) |
-| **Services / API** | Axios calls to backend |
+| Variable | Purpose | Default |
+|---|---|---|
+| `PORT` | Express API port | `5000` |
+| `MONGO_URI` | MongoDB connection string | Required |
+| `JWT_SECRET` | Secret used to sign JWTs | Required |
 
----
+Use a long, random JWT secret and a least-privilege MongoDB user. Never commit `.env` files or real credentials.
 
-## 📁 Project Structure
+## Run with Docker
 
-```
-my-fullstack-app/
-│
-├── client/                   # ⚛️ React Frontend
-│   ├── public/
-│   └── src/
-│       ├── components/       # Reusable UI components
-│       ├── pages/            # Route-level pages
-│       ├── context/          # Auth & Cart context
-│       ├── services/         # Axios API calls
-│       ├── App.jsx
-│       └── main.jsx
-│
-├── controllers/              # Handle request & response logic
-├── services/                 # Business logic (core of app 🔥)
-├── routes/                   # API endpoints
-├── middleware/               # Auth & error middleware
-├── db/                       # Database connection & models
-│
-├── .env                      # Environment variables
-├── package.json              # Backend dependencies
-└── package-lock.json
+From the repository root:
+
+```powershell
+Copy-Item .env.example .env
+# Replace the placeholders in .env with local development values.
+docker compose up --build
 ```
 
----
+The API is exposed at <http://localhost:5000> and the Vite development server at <http://localhost:5173>.
 
-## ⚙️ Installation
+## Run without Docker
 
-### 1. Clone the repository
+Start the API:
 
-```bash
-git clone https://github.com/your-username/my-fullstack-app.git
-cd my-fullstack-app
-```
-
-### 2. Install backend dependencies
-
-```bash
+```powershell
+Set-Location Server
 npm install
-```
-
-### 3. Install frontend dependencies
-
-```bash
-cd client
-npm install
-```
-
-### 4. Run the app
-
-**Backend:**
-```bash
-# From root folder
+Copy-Item ..\.env.example .env
+# Replace the placeholders in Server/.env with local development values.
 npm run dev
 ```
 
-**Frontend:**
-```bash
-# From /client folder
+In a second terminal, start the frontend:
+
+```powershell
+Set-Location client\Biler-Market
+npm install --legacy-peer-deps
 npm run dev
 ```
 
-> ✅ Backend runs on `http://localhost:5000`  
-> ✅ Frontend runs on `http://localhost:5173` (Vite) or `3000` (CRA)
+The frontend currently defines its API base URL in `client/Biler-Market/src/app/api/api.ts`. Point that value at `http://localhost:5000` when testing entirely locally.
 
----
+## REST API
 
-## 🔑 Environment Variables
+All product, loan, and profile routes require an `Authorization: Bearer <token>` header. Registration and login are public.
 
-Create a `.env` file in the **root** of the project:
+| Method | Route | Behavior |
+|---|---|---|
+| `POST` | `/users` | Register a user and return a token |
+| `POST` | `/users/login` | Authenticate a user |
+| `GET` | `/users/me` | Return the authenticated profile |
+| `PATCH` | `/users/me` | Update allowed profile fields |
+| `DELETE` | `/users/me` | Delete the authenticated profile |
+| `POST` | `/users/logout` | End the current session |
+| `POST` | `/users/logoutAll` | End all sessions |
+| `GET` | `/users` | List users for an authenticated request |
+| `POST` | `/products` | Create a user-owned product |
+| `GET` | `/products` | List the authenticated user's products |
+| `GET` | `/products/total` | Calculate total product price |
+| `GET` | `/products/:id` | Get one owned product |
+| `PATCH` | `/products/:id` | Update one owned product |
+| `DELETE` | `/products/:id` | Delete one owned product |
+| `POST` | `/loans` | Create a loan |
+| `GET` | `/loans` | List the authenticated user's loans |
+| `GET` | `/loans/:id` | Get one owned loan |
+| `PATCH` | `/loans/:id/pay` | Record a payment |
+| `DELETE` | `/loans/:id` | Delete one owned loan |
 
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-```
+## Skills demonstrated
 
-> ⚠️ Never commit your `.env` file. Add it to `.gitignore`.
+- Connecting a typed React client to an Express REST API
+- Designing user-owned MongoDB resources with Mongoose
+- Implementing token authentication and password hashing
+- Organizing routes, controllers, middleware, and data models
+- Running a multi-service development environment with Docker Compose
 
----
+## Project status
 
-## 📡 API Overview
+This is a portfolio and learning project. It does not currently include an automated test suite.
 
-### 🔐 Auth
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/users/register` | Register a new user |
-| POST | `/users/login` | Login & receive JWT |
+## Author
 
-### 🛍️ Products
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/products` | Get all products |
-| POST | `/products` | Create a product |
-| PUT | `/products/:id` | Update a product |
-| DELETE | `/products/:id` | Delete a product |
+Khalid Abdullahi Isse
 
-### 🛒 Cart
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/cart` | Get user's cart |
-| POST | `/cart` | Add item to cart |
+[GitHub](https://github.com/khalidabdullahiesse-hash) · [LinkedIn](https://www.linkedin.com/in/khalid-abdullahi-isse-0461a3366)
 
----
-
-## 🧠 What I Learned
-
-- Building scalable backend architecture (MVC + Services)
-- Separating concerns cleanly between layers
-- JWT authentication & protected routes
-- Building a React SPA that consumes a REST API
-- Managing global state with React Context
-- Structuring a real-world full-stack project
-
----
-
-## 📌 Future Improvements
-
-- [ ] 💳 Payment Integration (Stripe)
-- [ ] 🔍 Product search & category filters
-- [ ] 🧑‍💼 Admin dashboard (React)
-- [ ] ⭐ Reviews & ratings system
-- [ ] 📱 Fully responsive UI
-- [ ] 🚀 Deployment (Render + Vercel / Netlify)
-- [ ] 🧪 Unit & integration tests (Jest + React Testing Library)
-
----
-
-## 🖼️ Screenshots
-
-> 📸 Add screenshots of your UI here — this is **very important** for GitHub!
-
----
-
-## 🌐 Live Demo
-
-> 🔗 Add your deployed link here
-
----
-
-## 🤝 Contributing
-
-Contributions, issues and feature requests are welcome!  
-Feel free to fork the repo and open a PR.
-
----
-
-## 📄 License
-
-MIT License © 2024 Khalid Abdullahi Isse
-
----
-
-## 👨‍💻 Author
-
-**Khalid Abdullahi Isse**  
-[![GitHub](https://img.shields.io/badge/GitHub-your--username-181717?style=flat&logo=github)](https://github.com/your-username)
-
----
-
-## 🔥 Senior-Level Improvements (Next Steps)
-
-To push this project from mid to **senior level**:
-
-| Improvement | Tool / Approach |
-|-------------|----------------|
-| ✅ Input Validation | `Joi` or `express-validator` |
-| ✅ Global Error Handler | Custom Express middleware |
-| ✅ Logging | `Morgan` (HTTP) + `Winston` (app logs) |
-| ✅ API Documentation | `Swagger` / `swagger-ui-express` |
-| ✅ React Query / SWR | Better data fetching & caching |
-| ✅ Protected Routes | React Router + Auth Context |
-| ✅ Docker | `Dockerfile` + `docker-compose.yml` |
-| ✅ Tests | Jest (backend) + React Testing Library |
-
----
-
-> 💡 **This project already shows strong architectural thinking — the Service Layer alone puts it ahead of most junior portfolios.**
